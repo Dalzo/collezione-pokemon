@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collezione Booster Pack Artwork Pokémon</title>
+
+  <!-- Tailwind CSS per la Grafica -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            poke: {
+              yellow: '#FFCB05',
+              blue: '#003A70',
+              red: '#EE1515'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Inter & Phosphor Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .pack-foil {
+      background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 100%);
+    }
+    .pack-crimp-top {
+      background: repeating-linear-gradient(90deg, #94a3b8, #94a3b8 2px, #cbd5e1 2px, #cbd5e1 4px);
+    }
+    .pack-crimp-bottom {
+      background: repeating-linear-gradient(90deg, #94a3b8, #94a3b8 2px, #cbd5e1 2px, #cbd5e1 4px);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-full transition-colors flex flex-col">
+
+  <!-- Header dell'Applicazione -->
+  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center justify-between gap-4">
+        
+        <!-- Logo & Titolo -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-slate-900 font-extrabold shadow-md shadow-amber-500/20 text-xl">
+            <i class="ph-bold ph-cards"></i>
+          </div>
+          <div>
+            <h1 class="font-black text-lg sm:text-xl tracking-tight leading-none bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+              Booster Pack Artwork
+            </h1>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Collezione Bustine ITA (1999–2026)</p>
+          </div>
+        </div>
+
+        <!-- Azioni & Pulsanti Header -->
+        <div class="flex items-center gap-2">
+          <button id="shareLinkBtn" title="Condividi Sola Lettura" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm transition active:scale-95 shadow-sm">
+            <i class="ph-bold ph-share-network text-base"></i>
+            <span class="hidden sm:inline">Condividi</span>
+          </button>
+
+          <button id="adminToggleBtn" title="Accesso Modifica / Login" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-lg transition">
+            <i class="ph-bold ph-lock-key" id="adminIcon"></i>
+          </button>
+
+          <button id="themeToggleBtn" title="Cambia Tema" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-lg transition">
+            <i class="ph-bold ph-moon dark:hidden"></i>
+            <i class="ph-bold ph-sun hidden dark:block"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner Modalità Sola Lettura -->
+  <div id="readOnlyBanner" class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-xs text-amber-700 dark:text-amber-400 font-medium flex items-center justify-center gap-2">
+    <i class="ph-bold ph-eye text-base"></i>
+    <span>Modalità <strong>Sola Lettura</strong> attiva. Clicca sull'icona del lucchetto ed inserisci il PIN (Default: <code>1999</code>) per modificare.</span>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Dashboard Statistiche & Avanzamento -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold text-amber-500 uppercase tracking-wider">Progresso Album</span>
+          <h2 class="text-2xl font-black tracking-tight flex items-baseline gap-2">
+            <span id="statsPercentage">0%</span>
+            <span class="text-xs font-normal text-slate-500 dark:text-slate-400">completato</span>
+          </h2>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-semibold">
+          <div class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900">
+            Posseduti: <strong id="statsOwned">0</strong>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
+            Mancanti: <strong id="statsMissing">0</strong>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+            Totale Artwork: <strong id="statsTotal">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra di Progresso -->
+      <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden p-0.5">
+        <div id="statsProgressBar" class="bg-gradient-to-r from-amber-400 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Filtri e Barre di Ricerca -->
+    <div class="flex flex-col md:flex-row items-center gap-3">
+      <!-- Cerca per nome -->
+      <div class="relative w-full md:w-80">
+        <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base"></i>
+        <input type="text" id="searchInput" placeholder="Cerca Pokémon, Set o Anno..." 
+          class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+      </div>
+
+      <!-- Filtro Era -->
+      <select id="eraSelect" class="w-full md:w-64 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+        <option value="ALL">Tutte le Ere (1999–2026)</option>
+        <option value="WotC">Serie Originale & WotC (1999–2000)</option>
+        <option value="Neo">Serie Neo (2001–2002)</option>
+        <option value="e-Card">Serie e-Card (2002–2003)</option>
+        <option value="EX">Serie EX (2003–2007)</option>
+        <option value="DP">Diamante & Perla / Platino / HGSS (2007–2011)</option>
+        <option value="BW">Nero e Bianco (2011–2013)</option>
+        <option value="XY">Serie XY (2014–2016)</option>
+        <option value="SM">Sole e Luna (2017–2019)</option>
+        <option value="SWSH">Spada e Scudo (2020–2023)</option>
+        <option value="SV">Scarlatto e Violetto (2023–2025)</option>
+        <option value="MEGA">Mega Evoluzione (2026)</option>
+      </select>
+
+      <!-- Filtro Stato -->
+      <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-2xl w-full md:w-auto">
+        <button data-status="ALL" class="status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">Tutti</button>
+        <button data-status="OWNED" class="status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400">Posseduti</button>
+        <button data-status="MISSING" class="status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400">Mancanti</button>
+      </div>
+    </div>
+
+    <!-- Grid Contenitore Artwork -->
+    <div id="artworksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <!-- Le carte verranno collegate qui via JavaScript -->
+    </div>
+  </main>
+
+  <!-- Modal Condivisione -->
+  <div id="shareModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+        <i class="ph-bold ph-share-network"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-base">Condividi Collezione</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Copia questo link ed invialo a chi vuoi. Potranno vedere i tuoi artwork in **Sola Lettura**.</p>
+      </div>
+      <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center gap-2">
+        <input type="text" id="shareUrlInput" readonly class="w-full bg-transparent text-xs text-slate-600 dark:text-slate-300 focus:outline-none truncate">
+        <button id="copyShareUrlBtn" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold whitespace-nowrap">Copia</button>
+      </div>
+      <button id="closeShareModalBtn" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium text-xs">Chiudi</button>
+    </div>
+  </div>
+
+  <script>
+    // Database Completo degli Artwork (1999–2026)
+    const rawDatabase = [
+      // WotC Era
+      { era: 'WotC', set: 'Set Base', year: '1999', name: 'Charizard', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
+      { era: 'WotC', set: 'Set Base', year: '1999', name: 'Blastoise', color: 'from-blue-500 to-cyan-600', icon: 'ph-drop' },
+      { era: 'WotC', set: 'Set Base', year: '1999', name: 'Venusaur', color: 'from-emerald-500 to-teal-600', icon: 'ph-plant' },
+      
+      { era: 'WotC', set: 'Jungle', year: '2000', name: 'Wigglytuff', color: 'from-pink-400 to-rose-500', icon: 'ph-sparkle' },
+      { era: 'WotC', set: 'Jungle', year: '2000', name: 'Scyther', color: 'from-emerald-600 to-green-700', icon: 'ph-scissors' },
+      { era: 'WotC', set: 'Jungle', year: '2000', name: 'Flareon', color: 'from-amber-500 to-orange-600', icon: 'ph-fire' },
+
+      { era: 'WotC', set: 'Fossil', year: '2000', name: 'Lapras', color: 'from-cyan-500 to-blue-600', icon: 'ph-waves' },
+      { era: 'WotC', set: 'Fossil', year: '2000', name: 'Aerodactyl', color: 'from-stone-500 to-slate-700', icon: 'ph-bird' },
+      { era: 'WotC', set: 'Fossil', year: '2000', name: 'Zapdos', color: 'from-yellow-400 to-amber-500', icon: 'ph-lightning' },
+
+      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Giovanni', color: 'from-slate-700 to-slate-900', icon: 'ph-user-focus' },
+      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Dark Charizard', color: 'from-orange-600 to-amber-900', icon: 'ph-fire' },
+      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Dark Gyarados', color: 'from-blue-700 to-indigo-900', icon: 'ph-waves' },
+      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Jesse & James', color: 'from-purple-600 to-indigo-900', icon: 'ph-users' },
+
+      // Neo Era
+      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Lugia', color: 'from-slate-200 to-indigo-400', icon: 'ph-wind' },
+      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Typhlosion', color: 'from-orange-500 to-amber-600', icon: 'ph-fire' },
+      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Meganium', color: 'from-emerald-400 to-green-600', icon: 'ph-plant' },
+      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Feraligatr', color: 'from-blue-600 to-teal-700', icon: 'ph-drop' },
+
+      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Umbreon', color: 'from-slate-800 to-yellow-600', icon: 'ph-moon' },
+      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Tyranitar', color: 'from-emerald-800 to-slate-900', icon: 'ph-shield' },
+      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Espeon', color: 'from-purple-400 to-pink-500', icon: 'ph-sun' },
+      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Xatu', color: 'from-teal-500 to-emerald-700', icon: 'ph-eye' },
+
+      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Entei', color: 'from-red-600 to-amber-700', icon: 'ph-fire' },
+      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Raikou', color: 'from-yellow-400 to-amber-600', icon: 'ph-lightning' },
+      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Suicune', color: 'from-cyan-400 to-blue-600', icon: 'ph-waves' },
+      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Celebi', color: 'from-emerald-400 to-lime-500', icon: 'ph-tree' },
+
+      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Dark Gengar', color: 'from-purple-800 to-indigo-950', icon: 'ph-ghost' },
+      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Dark Tyranitar', color: 'from-stone-700 to-amber-950', icon: 'ph-skull' },
+      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Light Dragonite', color: 'from-amber-300 to-orange-400', icon: 'ph-star' },
+      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Togetic', color: 'from-slate-100 to-pink-300', icon: 'ph-heart' },
+
+      // e-Card Era
+      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Charizard', color: 'from-orange-500 to-amber-600', icon: 'ph-fire' },
+      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Blastoise', color: 'from-blue-600 to-indigo-700', icon: 'ph-drop' },
+      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Venusaur', color: 'from-emerald-500 to-green-700', icon: 'ph-plant' },
+      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Tyranitar', color: 'from-slate-700 to-emerald-900', icon: 'ph-shield' },
+
+      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Lugia', color: 'from-cyan-300 to-blue-600', icon: 'ph-wind' },
+      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Nidoking', color: 'from-purple-600 to-pink-700', icon: 'ph-crown' },
+      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Ampharos', color: 'from-yellow-400 to-amber-500', icon: 'ph-lightning' },
+      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Arcanine', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
+
+      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Ho-Oh', color: 'from-amber-400 to-red-600', icon: 'ph-sun-dim' },
+      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Charizard', color: 'from-orange-600 to-red-700', icon: 'ph-fire' },
+      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Gengar', color: 'from-purple-800 to-slate-900', icon: 'ph-ghost' },
+      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Alakazam', color: 'from-amber-500 to-yellow-600', icon: 'ph-brain' },
+
+      // EX Era
+      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Blaziken', color: 'from-red-500 to-amber-600', icon: 'ph-fire' },
+      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Sceptile', color: 'from-emerald-500 to-green-600', icon: 'ph-plant' },
+      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Swampert', color: 'from-blue-500 to-cyan-600', icon: 'ph-drop' },
+      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Mewtwo', color: 'from-purple-500 to-indigo-600', icon: 'ph-atom' },
+
+      { era: 'EX', set: 'EX Deoxys', year: '2005', name: 'Deoxys Attacco', color: 'from-orange-500 to-red-600', icon: 'ph-planet' },
+      { era: 'EX', set: 'EX Deoxys', year: '2005', name: 'Deoxys Difesa', color: 'from-teal-500 to-cyan-600', icon: 'ph-shield-check' },
+      { era: 'EX', set: 'EX Deoxys', year: '2005', name: 'Rayquaza', color: 'from-emerald-600 to-teal-800', icon: 'ph-path' },
+
+      // Sole e Luna / Spada e Scudo / Scarlatto e Violetto
+      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Charizard ex', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
+      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Blastoise ex', color: 'from-blue-600 to-indigo-700', icon: 'ph-drop' },
+      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Venusaur ex', color: 'from-emerald-500 to-teal-700', icon: 'ph-plant' },
+      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Mew ex', color: 'from-pink-400 to-purple-500', icon: 'ph-sparkle' },
+
+      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Sylveon ex', color: 'from-pink-400 to-rose-400', icon: 'ph-heart' },
+      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Umbreon ex', color: 'from-slate-800 to-amber-500', icon: 'ph-moon' },
+      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Espeon ex', color: 'from-purple-400 to-pink-500', icon: 'ph-sun' },
+      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Charizard ex', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
+
+      // 2026 Mega Evolution Era
+      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Charizard Z', color: 'from-purple-600 to-red-600', icon: 'ph-fire' },
+      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Dragonite', color: 'from-amber-400 to-orange-500', icon: 'ph-wind' },
+      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Tyranitar', color: 'from-slate-700 to-emerald-900', icon: 'ph-shield' },
+      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Lucario', color: 'from-blue-500 to-amber-500', icon: 'ph-hand-fist' },
+
+      { era: 'MEGA', set: '30th Celebration', year: '2026', name: 'Pikachu & Charizard 30th Gold', color: 'from-amber-300 via-yellow-400 to-amber-500', icon: 'ph-trophy' }
+    ];
+
+    // Stato dell'Applicazione
+    const SECRET_PIN = "1999";
+    let state = {
+      ownedIds: new Set(JSON.parse(localStorage.getItem('poke_owned_items') || '[]')),
+      isAdmin: localStorage.getItem('poke_is_admin') === 'true',
+      searchQuery: '',
+      selectedEra: 'ALL',
+      selectedStatus: 'ALL'
+    };
+
+    // Generazione ID Unici per ogni bustina
+    const items = rawDatabase.map(item => ({
+      ...item,
+      id: `${item.set}-${item.name}-${item.year}`.toLowerCase().replace(/[^a-z0-9]/g, '_')
+    }));
+
+    // Inizializzazione Interfaccia
+    function init() {
+      updateAdminUI();
+      setupEventListeners();
+      renderApp();
+    }
+
+    // Render della Pagina
+    function renderApp() {
+      const grid = document.getElementById('artworksGrid');
+      grid.innerHTML = '';
+
+      // Filtro degli item
+      const filtered = items.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
+                              item.set.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
+                              item.year.includes(state.searchQuery);
+        const matchesEra = state.selectedEra === 'ALL' || item.era === state.selectedEra;
+        const isOwned = state.ownedIds.has(item.id);
+        const matchesStatus = state.selectedStatus === 'ALL' || 
+                              (state.selectedStatus === 'OWNED' && isOwned) ||
+                              (state.selectedStatus === 'MISSING' && !isOwned);
+        return matchesSearch && matchesEra && matchesStatus;
+      });
+
+      // Aggiornamento Statistiche
+      const ownedCount = items.filter(i => state.ownedIds.has(i.id)).length;
+      const totalCount = items.length;
+      const missingCount = totalCount - ownedCount;
+      const percentage = totalCount > 0 ? Math.round((ownedCount / totalCount) * 100) : 0;
+
+      document.getElementById('statsOwned').textContent = ownedCount;
+      document.getElementById('statsMissing').textContent = missingCount;
+      document.getElementById('statsTotal').textContent = totalCount;
+      document.getElementById('statsPercentage').textContent = `${percentage}%`;
+      document.getElementById('statsProgressBar').style.width = `${percentage}%`;
+
+      // Se non ci sono risultati
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400">
+            <i class="ph-bold ph-cards text-4xl mb-2"></i>
+            <p class="text-sm font-medium">Nessun artwork trovato con i filtri selezionati.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Render di ogni singola carta di bustina
+      filtered.forEach(item => {
+        const isOwned = state.ownedIds.has(item.id);
+
+        const card = document.createElement('div');
+        card.className = `group relative bg-white dark:bg-slate-900 border ${isOwned ? 'border-emerald-500/50 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-800'} rounded-2xl p-3 shadow-sm hover:shadow-md transition-all flex flex-col justify-between`;
+
+        card.innerHTML = `
+          <!-- Grafica Bustina Vettoriale -->
+          <div class="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-br ${item.color} p-2 flex flex-col justify-between shadow-inner mb-3">
+            <div class="pack-crimp-top h-2 w-full rounded-sm opacity-60"></div>
+            <div class="pack-foil absolute inset-0"></div>
+
+            <!-- Header Bustina -->
+            <div class="relative z-10 flex items-center justify-between text-[10px] text-white/90 font-bold tracking-wider">
+              <span>ITA</span>
+              <span>${item.year}</span>
+            </div>
+
+            <!-- Icona Pokémon In Evidenza -->
+            <div class="relative z-10 my-auto text-center">
+              <i class="ph-bold ${item.icon} text-4xl sm:text-5xl text-white drop-shadow-md"></i>
+              <h4 class="text-white font-black text-xs sm:text-sm tracking-tight mt-1 drop-shadow">${item.name}</h4>
+            </div>
+
+            <!-- Footer Bustina -->
+            <div class="relative z-10 text-[9px] text-white/80 font-semibold text-center uppercase tracking-widest truncate">
+              ${item.set}
+            </div>
+            <div class="pack-crimp-bottom h-2 w-full rounded-sm opacity-60"></div>
+          </div>
+
+          <!-- Info & Pulsante Posseduto -->
+          <div class="space-y-2">
+            <div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.set}</div>
+              <div class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">${item.name}</div>
+            </div>
+
+            <button onclick="toggleOwned('${item.id}')" class="w-full py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 ${
+              isOwned 
+                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900' 
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+            }">
+              <i class="ph-bold ${isOwned ? 'ph-check-circle text-emerald-600' : 'ph-plus-circle'} text-base"></i>
+              <span>${isOwned ? 'Posseduto' : 'Mancante'}</span>
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Cambio di stato Posseduto / Mancante
+    function toggleOwned(id) {
+      if (!state.isAdmin) {
+        const pin = prompt("Inserisci il PIN Amministratore per modificare i salvataggi (Default: 1999):");
+        if (pin === SECRET_PIN) {
+          state.isAdmin = true;
+          localStorage.setItem('poke_is_admin', 'true');
+          updateAdminUI();
+        } else {
+          if (pin !== null) alert("PIN errato!");
+          return;
+        }
+      }
+
+      if (state.ownedIds.has(id)) {
+        state.ownedIds.delete(id);
+      } else {
+        state.ownedIds.add(id);
+      }
+
+      localStorage.setItem('poke_owned_items', JSON.stringify(Array.from(state.ownedIds)));
+      renderApp();
+    }
+
+    // Aggiorna grafica Banner e Lucchetto Admin
+    function updateAdminUI() {
+      const banner = document.getElementById('readOnlyBanner');
+      const icon = document.getElementById('adminIcon');
+      if (state.isAdmin) {
+        banner.classList.add('hidden');
+        icon.className = "ph-bold ph-lock-key-open text-emerald-500";
+      } else {
+        banner.classList.remove('hidden');
+        icon.className = "ph-bold ph-lock-key text-amber-500";
+      }
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        renderApp();
+      });
+
+      document.getElementById('eraSelect').addEventListener('change', (e) => {
+        state.selectedEra = e.target.value;
+        renderApp();
+      });
+
+      document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.status-btn').forEach(b => {
+            b.className = "status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400";
+          });
+          btn.className = "status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900";
+          state.selectedStatus = btn.dataset.status;
+          renderApp();
+        });
+      });
+
+      // Lock Admin Button
+      document.getElementById('adminToggleBtn').addEventListener('click', () => {
+        if (state.isAdmin) {
+          if (confirm("Vuoi uscire dalla modalità modifica?")) {
+            state.isAdmin = false;
+            localStorage.removeItem('poke_is_admin');
+            updateAdminUI();
+            renderApp();
+          }
+        } else {
+          const pin = prompt("Inserisci il PIN Amministratore (Default: 1999):");
+          if (pin === SECRET_PIN) {
+            state.isAdmin = true;
+            localStorage.setItem('poke_is_admin', 'true');
+            updateAdminUI();
+            renderApp();
+          } else if (pin !== null) {
+            alert("PIN errato!");
+          }
+        }
+      });
+
+      // Modale Condividi
+      const shareModal = document.getElementById('shareModal');
+      document.getElementById('shareLinkBtn').addEventListener('click', () => {
+        document.getElementById('shareUrlInput').value = window.location.href.split('?')[0];
+        shareModal.classList.remove('hidden');
+        setTimeout(() => shareModal.classList.remove('opacity-0'), 10);
+      });
+
+      document.getElementById('closeShareModalBtn').addEventListener('click', () => {
+        shareModal.classList.add('opacity-0');
+        setTimeout(() => shareModal.classList.add('hidden'), 200);
+      });
+
+      document.getElementById('copyShareUrlBtn').addEventListener('click', () => {
+        const input = document.getElementById('shareUrlInput');
+        input.select();
+        document.execCommand('copy');
+        document.getElementById('copyShareUrlBtn').textContent = "Copiato!";
+        setTimeout(() => document.getElementById('copyShareUrlBtn').textContent = "Copia", 2000);
+      });
+
+      // Tema Scuro/Chiaro
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
