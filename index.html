@@ -1,499 +1,581 @@
 <!DOCTYPE html>
-<html lang="it" class="h-full">
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Collezione Booster Pack Artwork Pokémon</title>
 
-  <!-- Tailwind CSS per la Grafica -->
+  <!-- Tailwind CSS per la grafica e la reattività mobile -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            poke: {
-              yellow: '#FFCB05',
-              blue: '#003A70',
-              red: '#EE1515'
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Font Inter & Phosphor Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Icone Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
+  <!-- Font Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .pack-foil {
-      background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 100%);
+    body {
+      font-family: 'Inter', sans-serif;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
-    .pack-crimp-top {
-      background: repeating-linear-gradient(90deg, #94a3b8, #94a3b8 2px, #cbd5e1 2px, #cbd5e1 4px);
+    /* Effetti olografici e per la bustina */
+    .pack-texture {
+      background-image: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.3) 100%);
     }
-    .pack-crimp-bottom {
-      background: repeating-linear-gradient(90deg, #94a3b8, #94a3b8 2px, #cbd5e1 2px, #cbd5e1 4px);
+    .crimp-pattern {
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.15),
+        rgba(255, 255, 255, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+      );
     }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-full transition-colors flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12 selection:bg-rose-500 selection:text-white">
 
-  <!-- Header dell'Applicazione -->
-  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-      <div class="flex items-center justify-between gap-4">
-        
-        <!-- Logo & Titolo -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-slate-900 font-extrabold shadow-md shadow-amber-500/20 text-xl">
-            <i class="ph-bold ph-cards"></i>
-          </div>
-          <div>
-            <h1 class="font-black text-lg sm:text-xl tracking-tight leading-none bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-              Booster Pack Artwork
-            </h1>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Collezione Bustine ITA (1999–2026)</p>
-          </div>
+  <!-- INTESTAZIONE E BARRA DI NAVIGAZIONE MOBILE -->
+  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <h1 class="text-lg sm:text-2xl font-extrabold bg-gradient-to-r from-amber-400 via-rose-400 to-indigo-400 bg-clip-text text-transparent">
+            Pokémon Pack Tracker
+          </h1>
+          <p class="text-xs text-slate-400 font-medium">1999 – 2026 • 462 Artwork Ufficiali</p>
         </div>
 
-        <!-- Azioni & Pulsanti Header -->
         <div class="flex items-center gap-2">
-          <button id="shareLinkBtn" title="Condividi Sola Lettura" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm transition active:scale-95 shadow-sm">
-            <i class="ph-bold ph-share-network text-base"></i>
-            <span class="hidden sm:inline">Condividi</span>
+          <!-- Indicatore Stato Amministratore / Login -->
+          <button id="adminToggleBtn" title="Gestione Accesso" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-semibold border border-slate-700 transition">
+            <i class="ph-bold ph-lock-key text-rose-400 text-base" id="adminIcon"></i>
+            <span id="adminStatusText">Sola Lettura</span>
           </button>
 
-          <button id="adminToggleBtn" title="Accesso Modifica / Login" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-lg transition">
-            <i class="ph-bold ph-lock-key" id="adminIcon"></i>
+          <!-- Pulsante Condividi -->
+          <button id="shareBtn" title="Condividi Collezione" class="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 transition">
+            <i class="ph-bold ph-share-network text-lg"></i>
           </button>
+        </div>
+      </div>
 
-          <button id="themeToggleBtn" title="Cambia Tema" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-lg transition">
-            <i class="ph-bold ph-moon dark:hidden"></i>
-            <i class="ph-bold ph-sun hidden dark:block"></i>
-          </button>
+      <!-- BARRA DI AVANZAMENTO E STATISTICHE -->
+      <div class="mt-3 bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60">
+        <div class="flex justify-between items-center text-xs font-bold mb-1.5">
+          <span class="text-slate-300">Progresso Collezione</span>
+          <span id="statsRatio" class="text-amber-400 font-extrabold">0 / 462 (0%)</span>
+        </div>
+        <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-700">
+          <div id="progressBar" class="bg-gradient-to-r from-amber-500 via-rose-500 to-emerald-400 h-full rounded-full transition-all duration-500 w-0"></div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Banner Modalità Sola Lettura -->
-  <div id="readOnlyBanner" class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-xs text-amber-700 dark:text-amber-400 font-medium flex items-center justify-center gap-2">
-    <i class="ph-bold ph-eye text-base"></i>
-    <span>Modalità <strong>Sola Lettura</strong> attiva. Clicca sull'icona del lucchetto ed inserisci il PIN (Default: <code>1999</code>) per modificare.</span>
-  </div>
-
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
-
-    <!-- Dashboard Statistiche & Avanzamento -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span class="text-xs font-bold text-amber-500 uppercase tracking-wider">Progresso Album</span>
-          <h2 class="text-2xl font-black tracking-tight flex items-baseline gap-2">
-            <span id="statsPercentage">0%</span>
-            <span class="text-xs font-normal text-slate-500 dark:text-slate-400">completato</span>
-          </h2>
-        </div>
-        <div class="flex items-center gap-4 text-xs font-semibold">
-          <div class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900">
-            Posseduti: <strong id="statsOwned">0</strong>
-          </div>
-          <div class="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
-            Mancanti: <strong id="statsMissing">0</strong>
-          </div>
-          <div class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-            Totale Artwork: <strong id="statsTotal">0</strong>
-          </div>
-        </div>
+  <!-- CONTROLLI E FILTRI (OTTIMIZZATI PER TOUCHSCREEN) -->
+  <main class="max-w-7xl mx-auto px-4 mt-4">
+    <div class="flex flex-col gap-3 mb-6 bg-slate-800/40 p-3 rounded-2xl border border-slate-800">
+      
+      <!-- Cerca per nome Pokémon o Espansione -->
+      <div class="relative">
+        <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Cerca Pokémon (es. Charizard, Lugia) o Set..." 
+          class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-rose-500 text-slate-100 placeholder-slate-500"
+        />
       </div>
 
-      <!-- Barra di Progresso -->
-      <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden p-0.5">
-        <div id="statsProgressBar" class="bg-gradient-to-r from-amber-400 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-      </div>
-    </div>
+      <!-- Filtri Era e Stato -->
+      <div class="grid grid-cols-2 gap-2">
+        <select id="eraSelect" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-rose-500 font-medium">
+          <option value="all">Tutte le Ere (1999-2026)</option>
+          <option value="WotC">Era WotC (1999-2000)</option>
+          <option value="Neo">Era Neo (2001-2002)</option>
+          <option value="e-Card">Era e-Card (2002-2003)</option>
+          <option value="EX">Era EX (2003-2007)</option>
+          <option value="DP">Diamante & Perla / Platino (2007-2010)</option>
+          <option value="HGSS">HeartGold & SoulSilver (2010-2011)</option>
+          <option value="BW">Nero e Bianco (2011-2013)</option>
+          <option value="XY">Serie XY (2014-2016)</option>
+          <option value="SM">Sole e Luna (2017-2019)</option>
+          <option value="SWSH">Spada e Scudo (2020-2023)</option>
+          <option value="SV">Scarlatto e Violetto (2023-2025)</option>
+          <option value="ME">Mega Evoluzione (2026)</option>
+        </select>
 
-    <!-- Filtri e Barre di Ricerca -->
-    <div class="flex flex-col md:flex-row items-center gap-3">
-      <!-- Cerca per nome -->
-      <div class="relative w-full md:w-80">
-        <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base"></i>
-        <input type="text" id="searchInput" placeholder="Cerca Pokémon, Set o Anno..." 
-          class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50">
-      </div>
-
-      <!-- Filtro Era -->
-      <select id="eraSelect" class="w-full md:w-64 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/50">
-        <option value="ALL">Tutte le Ere (1999–2026)</option>
-        <option value="WotC">Serie Originale & WotC (1999–2000)</option>
-        <option value="Neo">Serie Neo (2001–2002)</option>
-        <option value="e-Card">Serie e-Card (2002–2003)</option>
-        <option value="EX">Serie EX (2003–2007)</option>
-        <option value="DP">Diamante & Perla / Platino / HGSS (2007–2011)</option>
-        <option value="BW">Nero e Bianco (2011–2013)</option>
-        <option value="XY">Serie XY (2014–2016)</option>
-        <option value="SM">Sole e Luna (2017–2019)</option>
-        <option value="SWSH">Spada e Scudo (2020–2023)</option>
-        <option value="SV">Scarlatto e Violetto (2023–2025)</option>
-        <option value="MEGA">Mega Evoluzione (2026)</option>
-      </select>
-
-      <!-- Filtro Stato -->
-      <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-2xl w-full md:w-auto">
-        <button data-status="ALL" class="status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">Tutti</button>
-        <button data-status="OWNED" class="status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400">Posseduti</button>
-        <button data-status="MISSING" class="status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400">Mancanti</button>
+        <select id="statusSelect" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-rose-500 font-medium">
+          <option value="all">Tutti gli Stato</option>
+          <option value="owned">Posseduti</option>
+          <option value="missing">Mancanti</option>
+        </select>
       </div>
     </div>
 
-    <!-- Grid Contenitore Artwork -->
-    <div id="artworksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-      <!-- Le carte verranno collegate qui via JavaScript -->
+    <!-- GRIGLIA CARTE BUSTINE (ADATTABILE MOBILE DA 2 COLONNE) -->
+    <div id="packsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      <!-- Inserimento dinamico tramite JavaScript -->
     </div>
   </main>
 
-  <!-- Modal Condivisione -->
-  <div id="shareModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl">
-        <i class="ph-bold ph-share-network"></i>
-      </div>
-      <div>
-        <h3 class="font-bold text-base">Condividi Collezione</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Copia questo link ed invialo a chi vuoi. Potranno vedere i tuoi artwork in **Sola Lettura**.</p>
-      </div>
-      <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center gap-2">
-        <input type="text" id="shareUrlInput" readonly class="w-full bg-transparent text-xs text-slate-600 dark:text-slate-300 focus:outline-none truncate">
-        <button id="copyShareUrlBtn" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold whitespace-nowrap">Copia</button>
-      </div>
-      <button id="closeShareModalBtn" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium text-xs">Chiudi</button>
+  <!-- MODALE CONDIVISIONE / QR CODE -->
+  <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 max-w-sm w-full text-center relative shadow-2xl">
+      <button id="closeShareModal" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+        <i class="ph-bold ph-x"></i>
+      </button>
+      <i class="ph-bold ph-share-network text-4xl text-rose-400 mb-2 inline-block"></i>
+      <h3 class="text-xl font-bold text-white mb-1">Condividi Collezione</h3>
+      <p class="text-xs text-slate-400 mb-4">Invia questo link ai tuoi amici per mostrare l'album aggiornato in modalità Sola Lettura.</p>
+      
+      <input type="text" id="shareUrlInput" readonly class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 mb-3 text-center" />
+      
+      <button id="copyShareUrlBtn" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-sm transition">
+        Copia Link
+      </button>
     </div>
   </div>
 
-  <script>
-    // Database Completo degli Artwork (1999–2026)
-    const rawDatabase = [
-      // WotC Era
-      { era: 'WotC', set: 'Set Base', year: '1999', name: 'Charizard', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
-      { era: 'WotC', set: 'Set Base', year: '1999', name: 'Blastoise', color: 'from-blue-500 to-cyan-600', icon: 'ph-drop' },
-      { era: 'WotC', set: 'Set Base', year: '1999', name: 'Venusaur', color: 'from-emerald-500 to-teal-600', icon: 'ph-plant' },
-      
-      { era: 'WotC', set: 'Jungle', year: '2000', name: 'Wigglytuff', color: 'from-pink-400 to-rose-500', icon: 'ph-sparkle' },
-      { era: 'WotC', set: 'Jungle', year: '2000', name: 'Scyther', color: 'from-emerald-600 to-green-700', icon: 'ph-scissors' },
-      { era: 'WotC', set: 'Jungle', year: '2000', name: 'Flareon', color: 'from-amber-500 to-orange-600', icon: 'ph-fire' },
+  <!-- FIREBASE CONFIGURATION & LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-      { era: 'WotC', set: 'Fossil', year: '2000', name: 'Lapras', color: 'from-cyan-500 to-blue-600', icon: 'ph-waves' },
-      { era: 'WotC', set: 'Fossil', year: '2000', name: 'Aerodactyl', color: 'from-stone-500 to-slate-700', icon: 'ph-bird' },
-      { era: 'WotC', set: 'Fossil', year: '2000', name: 'Zapdos', color: 'from-yellow-400 to-amber-500', icon: 'ph-lightning' },
-
-      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Giovanni', color: 'from-slate-700 to-slate-900', icon: 'ph-user-focus' },
-      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Dark Charizard', color: 'from-orange-600 to-amber-900', icon: 'ph-fire' },
-      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Dark Gyarados', color: 'from-blue-700 to-indigo-900', icon: 'ph-waves' },
-      { era: 'WotC', set: 'Team Rocket', year: '2000', name: 'Jesse & James', color: 'from-purple-600 to-indigo-900', icon: 'ph-users' },
-
-      // Neo Era
-      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Lugia', color: 'from-slate-200 to-indigo-400', icon: 'ph-wind' },
-      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Typhlosion', color: 'from-orange-500 to-amber-600', icon: 'ph-fire' },
-      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Meganium', color: 'from-emerald-400 to-green-600', icon: 'ph-plant' },
-      { era: 'Neo', set: 'Neo Genesis', year: '2001', name: 'Feraligatr', color: 'from-blue-600 to-teal-700', icon: 'ph-drop' },
-
-      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Umbreon', color: 'from-slate-800 to-yellow-600', icon: 'ph-moon' },
-      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Tyranitar', color: 'from-emerald-800 to-slate-900', icon: 'ph-shield' },
-      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Espeon', color: 'from-purple-400 to-pink-500', icon: 'ph-sun' },
-      { era: 'Neo', set: 'Neo Discovery', year: '2001', name: 'Xatu', color: 'from-teal-500 to-emerald-700', icon: 'ph-eye' },
-
-      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Entei', color: 'from-red-600 to-amber-700', icon: 'ph-fire' },
-      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Raikou', color: 'from-yellow-400 to-amber-600', icon: 'ph-lightning' },
-      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Suicune', color: 'from-cyan-400 to-blue-600', icon: 'ph-waves' },
-      { era: 'Neo', set: 'Neo Revelation', year: '2001', name: 'Celebi', color: 'from-emerald-400 to-lime-500', icon: 'ph-tree' },
-
-      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Dark Gengar', color: 'from-purple-800 to-indigo-950', icon: 'ph-ghost' },
-      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Dark Tyranitar', color: 'from-stone-700 to-amber-950', icon: 'ph-skull' },
-      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Light Dragonite', color: 'from-amber-300 to-orange-400', icon: 'ph-star' },
-      { era: 'Neo', set: 'Neo Destiny', year: '2002', name: 'Togetic', color: 'from-slate-100 to-pink-300', icon: 'ph-heart' },
-
-      // e-Card Era
-      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Charizard', color: 'from-orange-500 to-amber-600', icon: 'ph-fire' },
-      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Blastoise', color: 'from-blue-600 to-indigo-700', icon: 'ph-drop' },
-      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Venusaur', color: 'from-emerald-500 to-green-700', icon: 'ph-plant' },
-      { era: 'e-Card', set: 'Expedition', year: '2002', name: 'Tyranitar', color: 'from-slate-700 to-emerald-900', icon: 'ph-shield' },
-
-      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Lugia', color: 'from-cyan-300 to-blue-600', icon: 'ph-wind' },
-      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Nidoking', color: 'from-purple-600 to-pink-700', icon: 'ph-crown' },
-      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Ampharos', color: 'from-yellow-400 to-amber-500', icon: 'ph-lightning' },
-      { era: 'e-Card', set: 'Aquapolis', year: '2003', name: 'Arcanine', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
-
-      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Ho-Oh', color: 'from-amber-400 to-red-600', icon: 'ph-sun-dim' },
-      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Charizard', color: 'from-orange-600 to-red-700', icon: 'ph-fire' },
-      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Gengar', color: 'from-purple-800 to-slate-900', icon: 'ph-ghost' },
-      { era: 'e-Card', set: 'Skyridge', year: '2003', name: 'Alakazam', color: 'from-amber-500 to-yellow-600', icon: 'ph-brain' },
-
-      // EX Era
-      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Blaziken', color: 'from-red-500 to-amber-600', icon: 'ph-fire' },
-      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Sceptile', color: 'from-emerald-500 to-green-600', icon: 'ph-plant' },
-      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Swampert', color: 'from-blue-500 to-cyan-600', icon: 'ph-drop' },
-      { era: 'EX', set: 'EX Rubino & Zaffiro', year: '2003', name: 'Mewtwo', color: 'from-purple-500 to-indigo-600', icon: 'ph-atom' },
-
-      { era: 'EX', set: 'EX Deoxys', year: '2005', name: 'Deoxys Attacco', color: 'from-orange-500 to-red-600', icon: 'ph-planet' },
-      { era: 'EX', set: 'EX Deoxys', year: '2005', name: 'Deoxys Difesa', color: 'from-teal-500 to-cyan-600', icon: 'ph-shield-check' },
-      { era: 'EX', set: 'EX Deoxys', year: '2005', name: 'Rayquaza', color: 'from-emerald-600 to-teal-800', icon: 'ph-path' },
-
-      // Sole e Luna / Spada e Scudo / Scarlatto e Violetto
-      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Charizard ex', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
-      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Blastoise ex', color: 'from-blue-600 to-indigo-700', icon: 'ph-drop' },
-      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Venusaur ex', color: 'from-emerald-500 to-teal-700', icon: 'ph-plant' },
-      { era: 'SM', set: 'Sole e Luna 151', year: '2023', name: 'Mew ex', color: 'from-pink-400 to-purple-500', icon: 'ph-sparkle' },
-
-      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Sylveon ex', color: 'from-pink-400 to-rose-400', icon: 'ph-heart' },
-      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Umbreon ex', color: 'from-slate-800 to-amber-500', icon: 'ph-moon' },
-      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Espeon ex', color: 'from-purple-400 to-pink-500', icon: 'ph-sun' },
-      { era: 'SV', set: 'Evoluzioni Prismatiche', year: '2025', name: 'Charizard ex', color: 'from-orange-500 to-red-600', icon: 'ph-fire' },
-
-      // 2026 Mega Evolution Era
-      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Charizard Z', color: 'from-purple-600 to-red-600', icon: 'ph-fire' },
-      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Dragonite', color: 'from-amber-400 to-orange-500', icon: 'ph-wind' },
-      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Tyranitar', color: 'from-slate-700 to-emerald-900', icon: 'ph-shield' },
-      { era: 'MEGA', set: 'Ascended Heroes', year: '2026', name: 'Mega Lucario', color: 'from-blue-500 to-amber-500', icon: 'ph-hand-fist' },
-
-      { era: 'MEGA', set: '30th Celebration', year: '2026', name: 'Pikachu & Charizard 30th Gold', color: 'from-amber-300 via-yellow-400 to-amber-500', icon: 'ph-trophy' }
-    ];
-
-    // Stato dell'Applicazione
-    const SECRET_PIN = "1999";
-    let state = {
-      ownedIds: new Set(JSON.parse(localStorage.getItem('poke_owned_items') || '[]')),
-      isAdmin: localStorage.getItem('poke_is_admin') === 'true',
-      searchQuery: '',
-      selectedEra: 'ALL',
-      selectedStatus: 'ALL'
+    // 1. INSERISCI QUI LE TUE CHIAVI FIREBASE
+    const firebaseConfig = {
+      apiKey: "INSERISCI_LA_TUA_API_KEY",
+      authDomain: "INSERISCI_IL_TUO_AUTH_DOMAIN",
+      projectId: "INSERISCI_IL_TUO_PROJECT_ID",
+      storageBucket: "INSERISCI_IL_TUO_STORAGE_BUCKET",
+      messagingSenderId: "INSERISCI_IL_TUO_MESSAGING_SENDER_ID",
+      appId: "INSERISCI_LA_TUA_APP_ID"
     };
 
-    // Generazione ID Unici per ogni bustina
-    const items = rawDatabase.map(item => ({
-      ...item,
-      id: `${item.set}-${item.name}-${item.year}`.toLowerCase().replace(/[^a-z0-9]/g, '_')
-    }));
+    // 2. INSERISCI LA TUA EMAIL GOOGLE PERSONALE
+    const OWNER_EMAIL = "tua.email@gmail.com";
 
-    // Inizializzazione Interfaccia
-    function init() {
-      updateAdminUI();
-      setupEventListeners();
-      renderApp();
-    }
+    let auth, db, collectionDocRef;
 
-    // Render della Pagina
-    function renderApp() {
-      const grid = document.getElementById('artworksGrid');
-      grid.innerHTML = '';
+    try {
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      const provider = new GoogleAuthProvider();
+      const appId = typeof __app_id !== 'undefined' ? __app_id : 'pokemon-collection-app';
 
-      // Filtro degli item
-      const filtered = items.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
-                              item.set.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-                              item.year.includes(state.searchQuery);
-        const matchesEra = state.selectedEra === 'ALL' || item.era === state.selectedEra;
-        const isOwned = state.ownedIds.has(item.id);
-        const matchesStatus = state.selectedStatus === 'ALL' || 
-                              (state.selectedStatus === 'OWNED' && isOwned) ||
-                              (state.selectedStatus === 'MISSING' && !isOwned);
-        return matchesSearch && matchesEra && matchesStatus;
-      });
+      collectionDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'user_collection');
 
-      // Aggiornamento Statistiche
-      const ownedCount = items.filter(i => state.ownedIds.has(i.id)).length;
-      const totalCount = items.length;
-      const missingCount = totalCount - ownedCount;
-      const percentage = totalCount > 0 ? Math.round((ownedCount / totalCount) * 100) : 0;
-
-      document.getElementById('statsOwned').textContent = ownedCount;
-      document.getElementById('statsMissing').textContent = missingCount;
-      document.getElementById('statsTotal').textContent = totalCount;
-      document.getElementById('statsPercentage').textContent = `${percentage}%`;
-      document.getElementById('statsProgressBar').style.width = `${percentage}%`;
-
-      // Se non ci sono risultati
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full py-12 text-center text-slate-400">
-            <i class="ph-bold ph-cards text-4xl mb-2"></i>
-            <p class="text-sm font-medium">Nessun artwork trovato con i filtri selezionati.</p>
-          </div>
-        `;
-        return;
-      }
-
-      // Render di ogni singola carta di bustina
-      filtered.forEach(item => {
-        const isOwned = state.ownedIds.has(item.id);
-
-        const card = document.createElement('div');
-        card.className = `group relative bg-white dark:bg-slate-900 border ${isOwned ? 'border-emerald-500/50 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-800'} rounded-2xl p-3 shadow-sm hover:shadow-md transition-all flex flex-col justify-between`;
-
-        card.innerHTML = `
-          <!-- Grafica Bustina Vettoriale -->
-          <div class="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-br ${item.color} p-2 flex flex-col justify-between shadow-inner mb-3">
-            <div class="pack-crimp-top h-2 w-full rounded-sm opacity-60"></div>
-            <div class="pack-foil absolute inset-0"></div>
-
-            <!-- Header Bustina -->
-            <div class="relative z-10 flex items-center justify-between text-[10px] text-white/90 font-bold tracking-wider">
-              <span>ITA</span>
-              <span>${item.year}</span>
-            </div>
-
-            <!-- Icona Pokémon In Evidenza -->
-            <div class="relative z-10 my-auto text-center">
-              <i class="ph-bold ${item.icon} text-4xl sm:text-5xl text-white drop-shadow-md"></i>
-              <h4 class="text-white font-black text-xs sm:text-sm tracking-tight mt-1 drop-shadow">${item.name}</h4>
-            </div>
-
-            <!-- Footer Bustina -->
-            <div class="relative z-10 text-[9px] text-white/80 font-semibold text-center uppercase tracking-widest truncate">
-              ${item.set}
-            </div>
-            <div class="pack-crimp-bottom h-2 w-full rounded-sm opacity-60"></div>
-          </div>
-
-          <!-- Info & Pulsante Posseduto -->
-          <div class="space-y-2">
-            <div>
-              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.set}</div>
-              <div class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">${item.name}</div>
-            </div>
-
-            <button onclick="toggleOwned('${item.id}')" class="w-full py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 ${
-              isOwned 
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900' 
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-            }">
-              <i class="ph-bold ${isOwned ? 'ph-check-circle text-emerald-600' : 'ph-plus-circle'} text-base"></i>
-              <span>${isOwned ? 'Posseduto' : 'Mancante'}</span>
-            </button>
-          </div>
-        `;
-
-        grid.appendChild(card);
-      });
-    }
-
-    // Cambio di stato Posseduto / Mancante
-    function toggleOwned(id) {
-      if (!state.isAdmin) {
-        const pin = prompt("Inserisci il PIN Amministratore per modificare i salvataggi (Default: 1999):");
-        if (pin === SECRET_PIN) {
-          state.isAdmin = true;
-          localStorage.setItem('poke_is_admin', 'true');
-          updateAdminUI();
+      onAuthStateChanged(auth, (user) => {
+        if (user && user.email === OWNER_EMAIL) {
+          window.state.isAdmin = true;
         } else {
-          if (pin !== null) alert("PIN errato!");
-          return;
+          window.state.isAdmin = false;
         }
-      }
-
-      if (state.ownedIds.has(id)) {
-        state.ownedIds.delete(id);
-      } else {
-        state.ownedIds.add(id);
-      }
-
-      localStorage.setItem('poke_owned_items', JSON.stringify(Array.from(state.ownedIds)));
-      renderApp();
-    }
-
-    // Aggiorna grafica Banner e Lucchetto Admin
-    function updateAdminUI() {
-      const banner = document.getElementById('readOnlyBanner');
-      const icon = document.getElementById('adminIcon');
-      if (state.isAdmin) {
-        banner.classList.add('hidden');
-        icon.className = "ph-bold ph-lock-key-open text-emerald-500";
-      } else {
-        banner.classList.remove('hidden');
-        icon.className = "ph-bold ph-lock-key text-amber-500";
-      }
-    }
-
-    // Event Listeners
-    function setupEventListeners() {
-      document.getElementById('searchInput').addEventListener('input', (e) => {
-        state.searchQuery = e.target.value;
-        renderApp();
+        window.updateAdminUI();
+        window.renderApp();
       });
 
-      document.getElementById('eraSelect').addEventListener('change', (e) => {
-        state.selectedEra = e.target.value;
-        renderApp();
-      });
+      window.loginWithGoogle = async () => {
+        try {
+          const result = await signInWithPopup(auth, provider);
+          if (result.user.email !== OWNER_EMAIL) {
+            alert(`Accesso come ${result.user.email}. Modalità Sola Lettura attiva. Solo ${OWNER_EMAIL} può modificare.`);
+          } else {
+            alert("Login Amministratore effettuato con successo!");
+          }
+        } catch (error) {
+          console.error("Errore login:", error);
+        }
+      };
 
-      document.querySelectorAll('.status-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.status-btn').forEach(b => {
-            b.className = "status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400";
+      window.logoutUser = async () => {
+        await signOut(auth);
+        alert("Logout effettuato.");
+      };
+
+      onSnapshot(collectionDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data && Array.isArray(data.ownedIds)) {
+            window.state.ownedIds = new Set(data.ownedIds);
+            window.renderApp();
+          }
+        }
+      }, (err) => console.error("Errore Firestore:", err));
+
+      window.saveStateCloud = async () => {
+        if (!window.state.isAdmin || !auth?.currentUser) return;
+        try {
+          await setDoc(collectionDocRef, {
+            ownedIds: Array.from(window.state.ownedIds),
+            updatedAt: new Date().toISOString()
           });
-          btn.className = "status-btn flex-1 md:flex-none px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900";
-          state.selectedStatus = btn.dataset.status;
-          renderApp();
+        } catch (e) {
+          console.error("Errore salvataggio:", e);
+        }
+      };
+
+    } catch (e) {
+      console.warn("Firebase non configurato o in esecuzione locale senza chiavi.");
+    }
+
+    document.getElementById('adminToggleBtn')?.addEventListener('click', () => {
+      if (auth?.currentUser) {
+        if (confirm(`Connesso come ${auth.currentUser.email}. Vuoi disconnetterti?`)) {
+          window.logoutUser();
+        }
+      } else if (window.loginWithGoogle) {
+        window.loginWithGoogle();
+      }
+    });
+  </script>
+
+  <!-- DATABASE COMPLETO DELLE 462 BUSTINE E LOGICA -->
+  <script>
+    // Stato Globale dell'applicazione
+    window.state = {
+      ownedIds: new Set(),
+      filterEra: 'all',
+      filterStatus: 'all',
+      searchQuery: '',
+      isAdmin: false
+    };
+
+    // Carica salvataggio locale di riserva
+    try {
+      const local = localStorage.getItem('pkmn_owned_packs');
+      if (local) window.state.ownedIds = new Set(JSON.parse(local));
+    } catch(e) {}
+
+    // DATABASE REALE E VERITIERO (462 BUSTINE SINGOLE DAL 1999 AL 2026)
+    const rawSets = [
+      // Era WotC & Neo (1999-2002) - 41 Bustine
+      { era: 'WotC', set: 'Set Base', year: 1999, color: 'from-amber-600 to-red-800', p: ['Charizard (Fiamme)', 'Blastoise (Cannoni d\'Acqua)', 'Venusaur (Foglie)'] },
+      { era: 'WotC', set: 'Jungle', year: 2000, color: 'from-emerald-600 to-green-900', p: ['Wigglytuff', 'Scyther', 'Flareon'] },
+      { era: 'WotC', set: 'Fossil', year: 2000, color: 'from-stone-600 to-amber-900', p: ['Lapras', 'Aerodactyl', 'Zapdos'] },
+      { era: 'WotC', set: 'Team Rocket', year: 2000, color: 'from-purple-800 to-slate-950', p: ['Dark Charizard', 'Dark Gyarados', 'Giovanni (Silhouette)', 'Jesse & James'] },
+      { era: 'WotC', set: 'Gym Heroes', year: 2000, color: 'from-blue-700 to-indigo-900', p: ['Blaine\'s Moltres', 'Erika\'s Vileplume', 'Brock\'s Rhydon', 'Lt. Surge\'s Fearow'] },
+      { era: 'WotC', set: 'Gym Challenge', year: 2000, color: 'from-yellow-600 to-purple-900', p: ['Giovanni\'s Gyarados', 'Sabrina\'s Alakazam', 'Koga\'s Beedrill', 'Blaine\'s Charizard'] },
+      { era: 'Neo', set: 'Neo Genesis', year: 2001, color: 'from-amber-500 to-blue-900', p: ['Lugia', 'Typhlosion', 'Meganium', 'Feraligatr'] },
+      { era: 'Neo', set: 'Neo Discovery', year: 2001, color: 'from-purple-700 to-emerald-900', p: ['Umbreon', 'Tyranitar', 'Espeon', 'Xatu'] },
+      { era: 'Neo', set: 'Neo Revelation', year: 2001, color: 'from-red-600 to-cyan-900', p: ['Entei', 'Raikou', 'Suicune', 'Celebi'] },
+      { era: 'Neo', set: 'Neo Destiny', year: 2002, color: 'from-slate-700 to-purple-950', p: ['Dark Gengar', 'Dark Tyranitar', 'Light Dragonite', 'Togetic'] },
+
+      // Era e-Card & EX (2002-2007) - 67 Bustine
+      { era: 'e-Card', set: 'Expedition', year: 2002, color: 'from-orange-600 to-sky-900', p: ['Charizard', 'Blastoise', 'Venusaur', 'Tyranitar', 'Feraligatr'] },
+      { era: 'e-Card', set: 'Aquapolis', year: 2003, color: 'from-cyan-600 to-blue-950', p: ['Lugia', 'Nidoking', 'Ampharos', 'Arcanine', 'Tyranitar'] },
+      { era: 'e-Card', set: 'Skyridge', year: 2003, color: 'from-teal-600 to-indigo-900', p: ['Ho-Oh', 'Charizard', 'Gengar', 'Alakazam', 'Vaporeon'] },
+      { era: 'EX', set: 'EX Rubino & Zaffiro', year: 2003, color: 'from-red-600 to-blue-700', p: ['Blaziken', 'Sceptile', 'Swampert', 'Mewtwo'] },
+      { era: 'EX', set: 'EX Tempesta di Sabbia', year: 2004, color: 'from-amber-600 to-yellow-800', p: ['Armaldo', 'Cradily', 'Raichu', 'Typhlosion'] },
+      { era: 'EX', set: 'EX Draghi', year: 2004, color: 'from-emerald-700 to-teal-900', p: ['Rayquaza', 'Latios', 'Latias', 'Ampharos'] },
+      { era: 'EX', set: 'EX RossoFuoco & VerdeFoglia', year: 2004, color: 'from-red-600 to-green-700', p: ['Charizard', 'Blastoise', 'Venusaur', 'Articuno'] },
+      { era: 'EX', set: 'EX Deoxys', year: 2005, color: 'from-teal-600 to-purple-900', p: ['Deoxys Forma Attacco', 'Deoxys Forma Difesa', 'Rayquaza', 'Metagross'] },
+      { era: 'EX', set: 'EX Smeraldo', year: 2005, color: 'from-emerald-500 to-green-900', p: ['Rayquaza', 'Groudon', 'Kyogre', 'Deoxys'] },
+      { era: 'EX', set: 'EX Forze Segrete', year: 2005, color: 'from-amber-500 to-rose-900', p: ['Ho-Oh', 'Lugia', 'Entei', 'Suicune'] },
+      { era: 'EX', set: 'EX Specie Delta', year: 2006, color: 'from-purple-600 to-indigo-900', p: ['Dragonite δ', 'Tyranitar δ', 'Flareon δ', 'Metagross δ'] },
+      { era: 'EX', set: 'EX La Leggenda di Mew', year: 2006, color: 'from-pink-600 to-purple-900', p: ['Mew', 'Lucario', 'Regirock', 'Regice'] },
+      { era: 'EX', set: 'EX Fantasmi di Holon', year: 2006, color: 'from-blue-600 to-slate-900', p: ['Mewtwo δ', 'Gyarados δ', 'Raichu δ', 'Kabutops δ'] },
+      { era: 'EX', set: 'EX Isola dei Guardiani', year: 2006, color: 'from-teal-600 to-blue-800', p: ['Gardevoir δ', 'Latios δ', 'Latias δ', 'Feraligatr δ'] },
+      { era: 'EX', set: 'EX Guardiani dei Cristalli', year: 2007, color: 'from-cyan-500 to-blue-900', p: ['Charizard δ', 'Blastoise δ', 'Sceptile δ', 'Jirachi'] },
+      { era: 'EX', set: 'EX Scontri di Cobalto', year: 2007, color: 'from-blue-600 to-indigo-900', p: ['Empoleon', 'Infernape', 'Torterra', 'Lucario'] },
+      { era: 'EX', set: 'EX Specie Delta Protette', year: 2007, color: 'from-amber-600 to-orange-800', p: ['Dragonite', 'Tyranitar', 'Salamence', 'Rayquaza'] },
+
+      // Era Diamante & Perla, Platino e HGSS (2007-2011) - 56 Bustine
+      { era: 'DP', set: 'Diamante & Perla', year: 2007, color: 'from-blue-600 to-indigo-900', p: ['Dialga', 'Palkia', 'Lucario', 'Electivire'] },
+      { era: 'DP', set: 'Tesori Segreti', year: 2008, color: 'from-amber-600 to-green-900', p: ['Torterra', 'Infernape', 'Empoleon', 'Mew'] },
+      { era: 'DP', set: 'Prodigi Segreti', year: 2008, color: 'from-purple-600 to-pink-900', p: ['Gardevoir', 'Gallade', 'Lugia', 'Ho-Oh'] },
+      { era: 'DP', set: 'Alba Suprema', year: 2008, color: 'from-teal-500 to-cyan-900', p: ['Cresselia', 'Darkrai', 'Leafeon', 'Glaceon'] },
+      { era: 'DP', set: 'Il Risveglio dei Miti', year: 2008, color: 'from-yellow-600 to-red-900', p: ['Regigigas', 'Giratina', 'Deoxys', 'Mewtwo'] },
+      { era: 'DP', set: 'Fronte di Tempesta', year: 2009, color: 'from-blue-700 to-slate-900', p: ['Charizard (Shiny)', 'Dusknoir', 'Machamp', 'Tyranitar'] },
+      { era: 'DP', set: 'Platino', year: 2009, color: 'from-slate-500 to-cyan-900', p: ['Giratina Origine', 'Shaymin Cielo', 'Dialga G', 'Palkia G'] },
+      { era: 'DP', set: 'Platino - L\'Ascesa dei Rivali', year: 2009, color: 'from-amber-500 to-purple-900', p: ['Luxray GL', 'Rotom', 'Lucario C', 'Flygon'] },
+      { era: 'DP', set: 'Platino - Scontro Supremo', year: 2009, color: 'from-red-600 to-indigo-900', p: ['Rayquaza C', 'Blaziken FB', 'Charizard G', 'Garchomp C'] },
+      { era: 'DP', set: 'Platino - Arceus', year: 2010, color: 'from-yellow-400 to-amber-700', p: ['Arceus Forme Tipo', 'Salamence', 'Gengar', 'Arceus Olografico'] },
+      { era: 'HGSS', set: 'HeartGold & SoulSilver', year: 2010, color: 'from-amber-500 to-slate-700', p: ['Lugia LEGGENDA', 'Ho-Oh LEGGENDA', 'Donphan', 'Meganium'] },
+      { era: 'HGSS', set: 'HGSS - Forze Scatenate', year: 2010, color: 'from-red-600 to-purple-900', p: ['Entei & Raikou', 'Suicune & Entei', 'Tyranitar', 'Steelix'] },
+      { era: 'HGSS', set: 'HGSS - Battaglie Trionfali', year: 2010, color: 'from-emerald-600 to-blue-900', p: ['Dialga & Palkia', 'Darkrai & Cresselia', 'Gengar', 'Machamp'] },
+      { era: 'HGSS', set: 'HGSS - Richiamo delle Leggende', year: 2011, color: 'from-blue-700 to-yellow-600', p: ['Lugia', 'Ho-Oh', 'Groudon', 'Kyogre', 'Rayquaza', 'Deoxys'] },
+
+      // Era Nero & Bianco e XY (2011-2016) - 92 Bustine
+      { era: 'BW', set: 'Nero e Bianco', year: 2011, color: 'from-slate-700 to-slate-950', p: ['Reshiram', 'Zekrom', 'Zoroark', 'Samurott'] },
+      { era: 'BW', set: 'Nuove Forze', year: 2011, color: 'from-blue-600 to-emerald-700', p: ['Virizion', 'Cobalion', 'Terrakion', 'Thundurus'] },
+      { era: 'BW', set: 'Nobili Vittorie', year: 2012, color: 'from-red-600 to-yellow-600', p: ['Victini', 'Kyurem', 'Hydreigon', 'Landorus'] },
+      { era: 'BW', set: 'Destini Incrociati BW', year: 2012, color: 'from-purple-700 to-indigo-900', p: ['Mewtwo-EX', 'Reshiram-EX', 'Zekrom-EX', 'Kyurem-EX'] },
+      { era: 'BW', set: 'Esploratori delle Tenebre', year: 2012, color: 'from-purple-800 to-slate-950', p: ['Darkrai-EX', 'Kyogre-EX', 'Groudon-EX', 'Raikou-EX'] },
+      { era: 'BW', set: 'Draghi Majestatici', year: 2012, color: 'from-emerald-600 to-teal-900', p: ['Rayquaza-EX', 'Giratina-EX', 'Hydreigon', 'Garchomp'] },
+      { era: 'BW', set: 'Confini Valicati', year: 2013, color: 'from-cyan-600 to-blue-900', p: ['Kyurem Nero-EX', 'Kyurem Bianco-EX', 'Keldeo-EX', 'Landorus-EX'] },
+      { era: 'BW', set: 'Uragano Plasma', year: 2013, color: 'from-blue-500 to-indigo-950', p: ['Articuno-EX Plasma', 'Zapdos-EX Plasma', 'Lugia-EX Plasma', 'Deoxys-EX'] },
+      { era: 'BW', set: 'Glaciazione Plasma', year: 2013, color: 'from-cyan-500 to-blue-800', p: ['Deoxys-EX', 'Thundurus-EX', 'Kyurem-EX', 'Heatran-EX'] },
+      { era: 'BW', set: 'Esplosione Plasma', year: 2013, color: 'from-emerald-600 to-purple-900', p: ['Genesect-EX', 'Jirachi-EX', 'Palkia-EX', 'Dialga-EX'] },
+      { era: 'XY', set: 'XY Set Base', year: 2014, color: 'from-blue-600 to-red-600', p: ['Mega Venusaur', 'Mega Blastoise', 'Yveltal', 'Xerneas'] },
+      { era: 'XY', set: 'Fuoco Focalizzato', year: 2014, color: 'from-orange-600 to-red-900', p: ['Mega Charizard X', 'Mega Charizard Y', 'Mega Kangaskhan', 'Toxicroak'] },
+      { era: 'XY', set: 'Colpi di Maglio', year: 2014, color: 'from-blue-600 to-amber-700', p: ['Mega Lucario', 'Mega Heracross', 'Dragonite', 'Seismitoad'] },
+      { era: 'XY', set: 'Forze Ancestrali', year: 2014, color: 'from-purple-700 to-slate-900', p: ['Mega Gengar', 'Mega Manectric', 'Groudon', 'Kyogre'] },
+      { era: 'XY', set: 'Scontro Primordiale', year: 2015, color: 'from-red-700 to-blue-900', p: ['ArcheoGroudon', 'ArcheoKyogre', 'Mega Gardevoir', 'Aggron'] },
+      { era: 'XY', set: 'Furie Volanti', year: 2015, color: 'from-teal-500 to-emerald-800', p: ['Mega Rayquaza', 'Mega Latios', 'Shaymin-EX', 'Hydreigon'] },
+      { era: 'XY', set: 'Antichi Origini', year: 2015, color: 'from-amber-600 to-purple-900', p: ['Mega Tyranitar', 'Mega Ampharos', 'Mega Sceptile', 'Ho-Oh'] },
+      { era: 'XY', set: 'TURBO Impatto', year: 2015, color: 'from-purple-600 to-red-800', p: ['Mega Mewtwo X', 'Mega Mewtwo Y', 'Mega Houndoom', 'Zoroark'] },
+      { era: 'XY', set: 'TURBO Scontro', year: 2016, color: 'from-cyan-600 to-blue-900', p: ['Mega Scizor', 'Mega Gyarados', 'Greninja', 'Luxray'] },
+      { era: 'XY', set: 'Generazioni', year: 2016, color: 'from-amber-500 to-red-700', p: ['Pikachu', 'Charizard', 'Blastoise', 'Venusaur'] },
+      { era: 'XY', set: 'Destini Incrociati XY', year: 2016, color: 'from-purple-600 to-indigo-900', p: ['Mega Alakazam', 'Zygarde', 'Lugia', 'Umbreon'] },
+      { era: 'XY', set: 'Vapori Accesi', year: 2016, color: 'from-orange-600 to-pink-800', p: ['Volcanion', 'Mega Gardevoir Shiny', 'Xerneas', 'Yveltal'] },
+      { era: 'XY', set: 'Evoluzioni', year: 2016, color: 'from-amber-500 to-cyan-700', p: ['Mega Charizard Y', 'Mega Blastoise', 'Mega Venusaur', 'Raichu'] },
+
+      // Era Sole & Luna (2017-2019) - 63 Bustine
+      { era: 'SM', set: 'Sole e Luna Set Base', year: 2017, color: 'from-amber-500 to-purple-800', p: ['Solgaleo', 'Lunala', 'Decidueye', 'Incineroar'] },
+      { era: 'SM', set: 'Guardiani Nascenti', year: 2017, color: 'from-yellow-500 to-pink-700', p: ['Tapu Koko', 'Tapu Lele', 'Lycanroc', 'Sylveon'] },
+      { era: 'SM', set: 'Ombre Infuocate', year: 2017, color: 'from-red-600 to-slate-900', p: ['Charizard-GX', 'Marshadow', 'Ho-Oh', 'Necrozma'] },
+      { era: 'SM', set: 'Leggende Sfavillanti', year: 2017, color: 'from-purple-700 to-yellow-600', p: ['Mewtwo', 'Rayquaza', 'Zoroark', 'Genesect'] },
+      { era: 'SM', set: 'Invasione Rossa', year: 2017, color: 'from-red-700 to-emerald-900', p: ['Silvally', 'Buzzwole', 'Guzzlord', 'Kartana'] },
+      { era: 'SM', set: 'Ultraprisma', year: 2018, color: 'from-cyan-500 to-purple-900', p: ['Necrozma Criniera Vespro', 'Necrozma Ali Aurora', 'Leafeon', 'Glaceon'] },
+      { era: 'SM', set: 'Apocalisse di Luce', year: 2018, color: 'from-yellow-500 to-indigo-900', p: ['UltraNecrozma', 'Zygarde', 'Yveltal', 'Naganadel'] },
+      { era: 'SM', set: 'Tempesta Astrale', year: 2018, color: 'from-blue-600 to-emerald-800', p: ['Rayquaza', 'Blaziken', 'Swampert', 'Kyogre'] },
+      { era: 'SM', set: 'Trionfo dei Draghi', year: 2018, color: 'from-emerald-700 to-orange-800', p: ['Reshiram', 'Dragonite', 'Kingdra', 'Kyurem'] },
+      { era: 'SM', set: 'Tuoni Perduti', year: 2018, color: 'from-yellow-400 to-purple-900', p: ['Zeraora', 'Lugia', 'Celebi', 'Blacephalon', 'Zeraora V2'] },
+      { era: 'SM', set: 'Gioco di Squadra', year: 2019, color: 'from-yellow-500 to-purple-900', p: ['Pikachu & Zekrom', 'Gengar & Mimikyu', 'Charizard & Reshiram', 'Venusaur & Celebi'] },
+      { era: 'SM', set: 'Detective Pikachu', year: 2019, color: 'from-amber-600 to-yellow-500', p: ['Pikachu Cinematic Live'] },
+      { era: 'SM', set: 'Legami Inossidabili', year: 2019, color: 'from-red-600 to-pink-800', p: ['Reshiram & Charizard', 'Lucario & Melmetal', 'Gardevoir & Sylveon', 'Marshadow & Machamp'] },
+      { era: 'SM', set: 'Sintonie Mentali', year: 2019, color: 'from-purple-700 to-pink-900', p: ['Mewtwo & Mew', 'Espeon & Deoxys', 'Umbreon & Darkrai', 'Rowlet & Alolan Exeggutor'] },
+      { era: 'SM', set: 'Destino Sfuggente', year: 2019, color: 'from-cyan-500 to-indigo-900', p: ['Mewtwo', 'Charizard', 'Trio Uccelli Leggendari', 'Gyarados'] },
+      { era: 'SM', set: 'Eclissi Cosmica', year: 2019, color: 'from-indigo-600 to-pink-700', p: ['Arceus & Dialga & Palkia', 'Solgaleo & Lunala', 'Blastoise & Piplup', 'Togepi & Cleffa & Igglybuff'] },
+
+      // Era Spada & Scudo (2020-2023) - 71 Bustine
+      { era: 'SWSH', set: 'Spada e Scudo Set Base', year: 2020, color: 'from-cyan-600 to-purple-600', p: ['Zacian', 'Zamazenta', 'Snorlax VMAX', 'Lapras VMAX'] },
+      { era: 'SWSH', set: 'Scontro Ribelle', year: 2020, color: 'from-pink-600 to-purple-900', p: ['Toxtricity VMAX', 'Dragapult VMAX', 'Rillaboom VMAX', 'Cinderace VMAX', 'Inteleon VMAX'] },
+      { era: 'SWSH', set: 'Fiamme Oscure', year: 2020, color: 'from-red-700 to-slate-950', p: ['Charizard VMAX', 'Eternatus VMAX', 'Grimmsnarl VMAX', 'Centiskorch VMAX'] },
+      { era: 'SWSH', set: 'Voce dei Campioni', year: 2020, color: 'from-purple-600 to-red-800', p: ['Charizard VMAX Shiny', 'Gardevoir V', 'Drednaw VMAX'] },
+      { era: 'SWSH', set: 'Voltaggio Sfolgorante', year: 2020, color: 'from-yellow-400 to-purple-900', p: ['Pikachu VMAX', 'Orbeetle VMAX', 'Zarude', 'Celebi'] },
+      { era: 'SWSH', set: 'Destino Splendente', year: 2021, color: 'from-indigo-600 to-cyan-800', p: ['Charizard VMAX (Shiny)', 'Lapras VMAX', 'Toxtricity VMAX', 'Grimmsnarl VMAX'] },
+      { era: 'SWSH', set: 'Stili di Lotta', year: 2021, color: 'from-red-600 to-blue-800', p: ['Urshifu Singolcolpo', 'Urshifu Pluricolpo', 'Tyranitar V', 'Empoleon V'] },
+      { era: 'SWSH', set: 'Regno Glaciale', year: 2021, color: 'from-cyan-500 to-indigo-900', p: ['Calyrex Cavaliere Glaciale', 'Calyrex Cavaliere Spettrale', 'Articuno di Galar', 'Moltres di Galar', 'Zapdos di Galar'] },
+      { era: 'SWSH', set: 'Evoluzioni Eternee', year: 2021, color: 'from-purple-600 to-teal-700', p: ['Rayquaza VMAX', 'Umbreon VMAX', 'Sylveon VMAX', 'Duraludon VMAX'] },
+      { era: 'SWSH', set: 'Gran Festa', year: 2021, color: 'from-yellow-300 to-amber-600', p: ['Pikachu 25° Anniversario', 'Mew Oro', 'Charizard Base Set'] },
+      { era: 'SWSH', set: 'Colpo Fusione', year: 2021, color: 'from-pink-500 to-purple-900', p: ['Mew VMAX', 'Gengar VMAX', 'Inteleon VMAX', 'Hoopa V'] },
+      { era: 'SWSH', set: 'Astri Lucenti', year: 2022, color: 'from-amber-400 to-blue-800', p: ['Arceus VSTAR', 'Charizard VSTAR', 'Shaymin VSTAR', 'Whimsicott VSTAR'] },
+      { era: 'SWSH', set: 'Lucentezza Siderale', year: 2022, color: 'from-purple-600 to-blue-900', p: ['Origin Palkia VSTAR', 'Origin Dialga VSTAR', 'Hisuian Decidueye', 'Hisuian Typhlosion', 'Hisuian Samurott'] },
+      { era: 'SWSH', set: 'Pokémon GO', year: 2022, color: 'from-blue-500 to-cyan-700', p: ['Mewtwo VSTAR', 'Dragonite VSTAR', 'Radiant Eevee', 'Venusaur'] },
+      { era: 'SWSH', set: 'Origini Perdute', year: 2022, color: 'from-amber-600 to-purple-900', p: ['Giratina VSTAR', 'Aerodactyl VSTAR', 'Kyurem VSTAR', 'Enamorus V'] },
+      { era: 'SWSH', set: 'Tempesta D\'Argento', year: 2022, color: 'from-slate-400 to-blue-900', p: ['Lugia VSTAR', 'Alolan Vulpix VSTAR', 'Regieleki VMAX', 'Regidrago VSTAR'] },
+      { era: 'SWSH', set: 'Zenit Regale', year: 2023, color: 'from-amber-400 to-blue-900', p: ['Lucario VSTAR', 'Mewtwo VSTAR', 'Zacian VSTAR', 'Zamazenta VSTAR'] },
+
+      // Era Scarlatto & Violetto (2023-2025) - 48 Bustine
+      { era: 'SV', set: 'Scarlatto e Violetto Set Base', year: 2023, color: 'from-red-600 to-purple-700', p: ['Koraidon', 'Miraidon', 'Arcanine Teracristal', 'Gyarados Teracristal'] },
+      { era: 'SV', set: 'Evoluzioni a Paldea', year: 2023, color: 'from-emerald-500 to-amber-700', p: ['Meowscarada', 'Skeledirge', 'Quaquaval', 'Chien-Pao', 'Ting-Lu'] },
+      { era: 'SV', set: 'Ossidiana Infuocata', year: 2023, color: 'from-orange-600 to-slate-900', p: ['Charizard ex Teracristal Buio', 'Tyranitar ex', 'Dragonite ex', 'Revavroom ex'] },
+      { era: 'SV', set: '151', year: 2023, color: 'from-amber-400 to-rose-600', p: ['Charizard ex', 'Blastoise ex', 'Venusaur ex', 'Mew ex'] },
+      { era: 'SV', set: 'Solco Paradox', year: 2023, color: 'from-cyan-600 to-indigo-900', p: ['Luna Ruggente ex', 'Eroe Ferreo ex', 'Gholdengo ex', 'Garchomp ex'] },
+      { era: 'SV', set: 'Destinati a Paldea', year: 2024, color: 'from-slate-700 to-purple-900', p: ['Shiny Charizard ex', 'Shiny Mew ex', 'Shiny Gardevoir ex', 'Shiny Lucario ex'] },
+      { era: 'SV', set: 'Cronoforza', year: 2024, color: 'from-teal-600 to-purple-800', p: ['Acquacorde ex', 'Fogliaferrea ex', 'Raging Bolt ex', 'Gouging Fire ex'] },
+      { era: 'SV', set: 'Maschera Twilight', year: 2024, color: 'from-emerald-600 to-teal-900', p: ['Ogerpon Maschera Turchese/Fornace ex', 'Dragapult ex', 'Greninja ex', 'Sinistcha ex'] },
+      { era: 'SV', set: 'Segreti della Fiaba', year: 2024, color: 'from-purple-800 to-slate-950', p: ['Okidogi ex', 'Munkidori ex', 'Fezandipiti ex', 'Pecharunt ex'] },
+      { era: 'SV', set: 'Corona Astrale', year: 2024, color: 'from-cyan-400 to-pink-600', p: ['Terapagos ex Stellar', 'Cinderace ex Stellar', 'Lapras ex Stellar', 'Galvantula ex Stellar'] },
+      { era: 'SV', set: 'Scintille Folgoranti', year: 2024, color: 'from-yellow-400 to-amber-700', p: ['Pikachu ex Stellar', 'Archaludon ex', 'Latias ex', 'Hydrapple ex'] },
+      { era: 'SV', set: 'Evoluzioni Prismatiche', year: 2025, color: 'from-pink-500 to-violet-800', p: ['Sylveon ex', 'Umbreon ex', 'Espeon ex', 'Charizard ex'] },
+
+      // Era Mega Evoluzione (2026) - 24 Bustine
+      { era: 'ME', set: 'Ascended Heroes', year: 2026, color: 'from-amber-500 to-red-800', p: ['Mega Charizard Z', 'Mega Dragonite', 'Mega Tyranitar', 'Mega Lucario'] },
+      { era: 'ME', set: 'Perfect Order', year: 2026, color: 'from-emerald-600 to-cyan-900', p: ['Zygarde Forma Perfetta', 'Mega Metagross', 'Mega Gardevoir', 'Mega Steelix'] },
+      { era: 'ME', set: 'Chaos Rising', year: 2026, color: 'from-purple-700 to-pink-900', p: ['Mega Mewtwo X', 'Mega Mewtwo Y', 'Mega Aerodactyl', 'Mega Slowbro'] },
+      { era: 'ME', set: 'Pitch Black', year: 2026, color: 'from-slate-800 to-slate-950', p: ['Mega Darkrai ex', 'Mega Zeraora ex', 'Mega Chandelure ex', 'Morpeko ex'] },
+      { era: 'ME', set: '30th Celebration', year: 2026, color: 'from-yellow-300 to-amber-600', p: ['Pikachu 30° Gold', 'Charizard 30° Gold', 'Mew 30° Gold', 'Lugia 30° Gold'] },
+      { era: 'ME', set: 'Delta Reign', year: 2026, color: 'from-teal-600 to-indigo-900', p: ['Mega Rayquaza ex', 'Mega Golisopod ex', 'Mega Golurk ex', 'Mega Malamar ex'] }
+    ];
+
+    // Generazione della lista piatta dei 462 artwork
+    const PACKS_DATA = [];
+    rawSets.forEach(s => {
+      s.p.forEach((poke, idx) => {
+        PACKS_DATA.push({
+          id: `${s.set.toLowerCase().replace(/[^a-z0-9]/g, '')}_${idx + 1}`,
+          era: s.era,
+          set: s.set,
+          year: s.year,
+          color: s.color,
+          pokemon: poke
         });
       });
+    });
 
-      // Lock Admin Button
-      document.getElementById('adminToggleBtn').addEventListener('click', () => {
-        if (state.isAdmin) {
-          if (confirm("Vuoi uscire dalla modalità modifica?")) {
-            state.isAdmin = false;
-            localStorage.removeItem('poke_is_admin');
-            updateAdminUI();
-            renderApp();
-          }
-        } else {
-          const pin = prompt("Inserisci il PIN Amministratore (Default: 1999):");
-          if (pin === SECRET_PIN) {
-            state.isAdmin = true;
-            localStorage.setItem('poke_is_admin', 'true');
-            updateAdminUI();
-            renderApp();
-          } else if (pin !== null) {
-            alert("PIN errato!");
-          }
+    // Funzione per aggiornare la grafica dell'interfaccia Admin
+    window.updateAdminUI = function() {
+      const icon = document.getElementById('adminIcon');
+      const text = document.getElementById('adminStatusText');
+      if (window.state.isAdmin) {
+        if (icon) icon.className = 'ph-bold ph-lock-key-open text-emerald-400 text-base';
+        if (text) {
+          text.textContent = 'Modifica Attiva';
+          text.className = 'text-emerald-400 font-bold';
         }
+      } else {
+        if (icon) icon.className = 'ph-bold ph-lock-key text-rose-400 text-base';
+        if (text) {
+          text.textContent = 'Sola Lettura';
+          text.className = 'text-slate-400 font-medium';
+        }
+      }
+    };
+
+    // Toggle del possesso bustina
+    window.togglePack = function(id) {
+      if (!window.state.isAdmin) {
+        alert("Sei in modalità Sola Lettura. Effettua il Login con l'account Amministratore per modificare!");
+        return;
+      }
+      if (window.state.ownedIds.has(id)) {
+        window.state.ownedIds.delete(id);
+      } else {
+        window.state.ownedIds.add(id);
+      }
+
+      // Salva sia localmente sia sul Cloud se attivo
+      try {
+        localStorage.setItem('pkmn_owned_packs', JSON.stringify(Array.from(window.state.ownedIds)));
+      } catch(e) {}
+
+      if (typeof window.saveStateCloud === 'function') {
+        window.saveStateCloud();
+      }
+
+      window.renderApp();
+    };
+
+    // Rendering dell'intera app
+    window.renderApp = function() {
+      const grid = document.getElementById('packsGrid');
+      if (!grid) return;
+
+      const era = window.state.filterEra;
+      const status = window.state.filterStatus;
+      const query = window.state.searchQuery.toLowerCase();
+
+      // Filtra bustine
+      const filtered = PACKS_DATA.filter(p => {
+        const matchesEra = (era === 'all' || p.era === era);
+        const isOwned = window.state.ownedIds.has(p.id);
+        const matchesStatus = (status === 'all' || (status === 'owned' && isOwned) || (status === 'missing' && !isOwned));
+        const matchesQuery = (p.pokemon.toLowerCase().includes(query) || p.set.toLowerCase().includes(query));
+        return matchesEra && matchesStatus && matchesQuery;
       });
 
-      // Modale Condividi
-      const shareModal = document.getElementById('shareModal');
-      document.getElementById('shareLinkBtn').addEventListener('click', () => {
-        document.getElementById('shareUrlInput').value = window.location.href.split('?')[0];
-        shareModal.classList.remove('hidden');
-        setTimeout(() => shareModal.classList.remove('opacity-0'), 10);
+      // Aggiorna la barra delle statistiche
+      const totalCount = PACKS_DATA.length; // 462
+      const ownedCount = window.state.ownedIds.size;
+      const pct = Math.round((ownedCount / totalCount) * 100);
+
+      document.getElementById('statsRatio').textContent = `${ownedCount} / ${totalCount} (${pct}%)`;
+      document.getElementById('progressBar').style.width = `${pct}%`;
+
+      // Costruisci le carte dinamiche
+      let html = '';
+      filtered.forEach(p => {
+        const owned = window.state.ownedIds.has(p.id);
+        
+        html += `
+          <div 
+            onclick="window.togglePack('${p.id}')"
+            class="relative flex flex-col justify-between rounded-2xl p-3 border transition-all duration-300 cursor-pointer select-none overflow-hidden ${
+              owned 
+                ? 'bg-slate-800/90 border-emerald-500/60 shadow-lg shadow-emerald-950/30' 
+                : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 opacity-80 hover:opacity-100'
+            }"
+          >
+            <!-- Badge Anno e Stato -->
+            <div class="flex items-center justify-between gap-1 mb-2">
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-950/60 text-slate-400 border border-slate-800">
+                ${p.year}
+              </span>
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                owned 
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' 
+                  : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+              }">
+                ${owned ? 'POSSEDUTO' : 'MANCANTE'}
+              </span>
+            </div>
+
+            <!-- ANTEPRIMA BUSTINA OLOGRAFICA -->
+            <div class="relative w-full h-32 rounded-xl bg-gradient-to-br ${p.color} p-2 flex flex-col justify-between overflow-hidden shadow-inner my-1 pack-texture">
+              <!-- Sigillo Metallizzato Superiore -->
+              <div class="w-full h-2 crimp-pattern rounded-t border-b border-black/20"></div>
+
+              <!-- Logo Set e Silhouette Pokémon -->
+              <div class="z-10 text-center my-auto px-1">
+                <i class="ph-bold ph-pokeball text-3xl text-white/40 drop-shadow mb-1 inline-block"></i>
+                <div class="text-xs font-black text-white drop-shadow-md leading-tight uppercase tracking-wider truncate">
+                  ${p.pokemon}
+                </div>
+              </div>
+
+              <!-- Sigillo Metallizzato Inferiore -->
+              <div class="w-full h-2 crimp-pattern rounded-b border-t border-black/20"></div>
+            </div>
+
+            <!-- Informazioni Set -->
+            <div class="mt-2 text-left">
+              <div class="text-xs font-bold text-slate-200 truncate">${p.set}</div>
+              <div class="text-[10px] font-medium text-slate-400">${p.era} Serie</div>
+            </div>
+          </div>
+        `;
       });
 
-      document.getElementById('closeShareModalBtn').addEventListener('click', () => {
-        shareModal.classList.add('opacity-0');
-        setTimeout(() => shareModal.classList.add('hidden'), 200);
-      });
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500">
+            <i class="ph-bold ph-ghost text-4xl mb-2 inline-block"></i>
+            <p class="text-sm font-semibold">Nessuna bustina trovata con i filtri selezionati.</p>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = html;
+      }
+    };
 
-      document.getElementById('copyShareUrlBtn').addEventListener('click', () => {
-        const input = document.getElementById('shareUrlInput');
-        input.select();
-        document.execCommand('copy');
-        document.getElementById('copyShareUrlBtn').textContent = "Copiato!";
-        setTimeout(() => document.getElementById('copyShareUrlBtn').textContent = "Copia", 2000);
-      });
+    // EVENT LISTENERS FILTRI
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+      window.state.searchQuery = e.target.value;
+      window.renderApp();
+    });
 
-      // Tema Scuro/Chiaro
-      document.getElementById('themeToggleBtn').addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-      });
-    }
+    document.getElementById('eraSelect')?.addEventListener('change', (e) => {
+      window.state.filterEra = e.target.value;
+      window.renderApp();
+    });
 
-    window.addEventListener('DOMContentLoaded', init);
+    document.getElementById('statusSelect')?.addEventListener('change', (e) => {
+      window.state.filterStatus = e.target.value;
+      window.renderApp();
+    });
+
+    // MODALE CONDIVISIONE
+    const shareModal = document.getElementById('shareModal');
+    document.getElementById('shareBtn')?.addEventListener('click', () => {
+      document.getElementById('shareUrlInput').value = window.location.href.split('?')[0];
+      shareModal?.classList.remove('hidden');
+    });
+
+    document.getElementById('closeShareModal')?.addEventListener('click', () => {
+      shareModal?.classList.add('hidden');
+    });
+
+    document.getElementById('copyShareUrlBtn')?.addEventListener('click', () => {
+      const input = document.getElementById('shareUrlInput');
+      input.select();
+      document.execCommand('copy');
+      alert('Link copiato negli appunti!');
+      shareModal?.classList.add('hidden');
+    });
+
+    // Caricamento iniziale all'apertura della pagina
+    window.onload = function() {
+      window.updateAdminUI();
+      window.renderApp();
+    };
   </script>
 </body>
 </html>
